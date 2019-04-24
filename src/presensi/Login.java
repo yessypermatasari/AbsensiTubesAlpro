@@ -18,7 +18,8 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 public class Login extends javax.swing.JFrame {
-
+ private Connection dbConnection;
+    private Koneksi db = new Koneksi();
     /**
      * Creates new form Login
      */
@@ -159,19 +160,37 @@ public class Login extends javax.swing.JFrame {
     private void button1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button1ActionPerformed
         // TODO add your handling code here:
         // TODO add your handling code here:
-        Connection connection;
-        PreparedStatement ps;
-        try{
-            String query = "SELECT * FROM `login` WHERE `username` = ? AND `password` = ? AND `level` = ? ";
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/absensi", "root", "");
-            ps = connection.prepareStatement(query);
-            ps.setString(1, txtusr.getText());
-            ps.setString(2, txtpw.getText());
-            ps.setString(3, String.valueOf(jComboBox1.getSelectedItem()));
-            ResultSet result = ps.executeQuery();
-            if(result.next()){
+        String username = txtusr.getText();
+        String password = txtpw.getText();
+        String level = (String) jComboBox1.getSelectedItem();
+        int u_uid = 0, u_usia = 0;
+        String u_nama = null,u_nim = null, u_alamat = null, u_telepon = null;
+        
+        db.dbConnection();
+        try {
+            String sql = "SELECT * FROM pengguna WHERE username = '" + username + "' AND password = '" + password + "' AND levell = '" + level + "'";
+            Statement st = db.getConnection().createStatement();
+            ResultSet rsLogin = st.executeQuery(sql);
 
-                if(jComboBox1.getSelectedIndex() == 0){
+            while (rsLogin.next()) {
+                u_uid = rsLogin.getInt("uid");
+                u_nama = rsLogin.getString("nama");
+                u_nim = rsLogin.getString("nim");
+                u_alamat = rsLogin.getString("alamat");
+                u_telepon = rsLogin.getString("telepon");
+                u_usia = rsLogin.getInt("usia");
+            }
+            rsLogin.last(); //mengecek jumlah baris pada hasil query
+            if (rsLogin.getRow()==1){
+                UserSession.setU_uid(u_uid);
+                UserSession.setU_nama(u_nama);
+                UserSession.setU_nim(u_nim);
+                UserSession.setU_alamat(u_alamat);
+                UserSession.setU_telepon(u_telepon);
+                UserSession.setU_usia(u_usia);
+                UserSession.setU_username(username);
+                UserSession.setU_password(password);
+                  if(jComboBox1.getSelectedIndex() == 0){
                     Student A = new Student();
                     A.setVisible(true);
                     setVisible(false);
@@ -180,15 +199,13 @@ public class Login extends javax.swing.JFrame {
                     A.setVisible(true);
                     setVisible(false);
                 }
-            }
-            else {
-                JOptionPane.showMessageDialog(rootPane, "Salah!");
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, Username / Password salah!");
                 txtpw.setText("");
-                txtusr.requestFocus();
+                txtpw.requestFocus();
             }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(rootPane, "gagal");
-        }          // TO
+        } catch (SQLException e) {
+        }       // TO
     }//GEN-LAST:event_button1ActionPerformed
 
     /**
