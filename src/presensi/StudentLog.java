@@ -5,8 +5,13 @@
  */
 package presensi;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -19,6 +24,7 @@ public class StudentLog extends javax.swing.JFrame {
      */
     public StudentLog() {
         initComponents();
+        selectData();
     }
 
     /**
@@ -33,6 +39,7 @@ public class StudentLog extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
@@ -51,19 +58,32 @@ public class StudentLog extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Arrows-Back-icon.png"))); // NOI18N
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel3MouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 90, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(jLabel3)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 600, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(497, Short.MAX_VALUE)
+                .addComponent(jLabel3)
+                .addGap(39, 39, 39))
         );
 
         getContentPane().add(jPanel1);
-        jPanel1.setBounds(0, 0, 90, 600);
+        jPanel1.setBounds(0, 0, 110, 600);
 
         jPanel2.setBackground(new java.awt.Color(255, 204, 0));
 
@@ -98,7 +118,7 @@ public class StudentLog extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(58, Short.MAX_VALUE)
+                .addContainerGap(38, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 781, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -128,7 +148,7 @@ public class StudentLog extends javax.swing.JFrame {
         );
 
         getContentPane().add(jPanel2);
-        jPanel2.setBounds(90, 0, 890, 600);
+        jPanel2.setBounds(110, 0, 870, 600);
 
         setSize(new java.awt.Dimension(994, 659));
         setLocationRelativeTo(null);
@@ -144,6 +164,13 @@ public class StudentLog extends javax.swing.JFrame {
         System.err.format("Cannot print %s%n", e.getMessage());
     }   
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jLabel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel3MouseClicked
+        // TODO add your handling code here:
+          Student A = new Student();
+                    A.setVisible(true);
+                    setVisible(false);
+    }//GEN-LAST:event_jLabel3MouseClicked
 
     /**
      * @param args the command line arguments
@@ -179,13 +206,59 @@ public class StudentLog extends javax.swing.JFrame {
             }
         });
     }
-
+    private void selectData() {
+        
+        String kolom[]={"Date","Nim","Room","readerNumber","Lecture","Course"};
+        DefaultTableModel dtm = new DefaultTableModel(null, kolom);   
+        String SQL = "SELECT absensi.tanggal,pengguna.nim,absensi.kelas_absensi,absensi.reader,matkul.uid,matkul.nama_matkul FROM absensi " +
+                     "INNER JOIN matkul ON absensi.id_matkul=matkul.id_matkul "+
+                     "INNER JOIN pengguna ON absensi.uid=pengguna.uid where nim ="+UserSession.getU_nim();
+        ResultSet rs = KoneksiDB.executeQuery(SQL);
+            try{
+            while(rs.next()){
+                String Date = rs.getString("tanggal");
+                String Nim = rs.getString("nim");
+                String Room = rs.getString("kelas_absensi");
+                String readerNumber = rs.getString("reader");
+                String Lecture = get_lectureName(rs.getInt("uid"));
+                String Course = rs.getString("nama_matkul");
+                
+                
+                   
+                    String data[] = {Date,Nim,Room,readerNumber,Lecture,Course};
+                    dtm.addRow(data);
+            }
+        }   catch(SQLException ex){
+                    Logger.getLogger(StudentLog.class.getName()).log(Level.SEVERE,null, ex);
+                    }
+            jTable2.setModel(dtm);     //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    public static String get_lectureName(int uid) {
+        String lectureName = null;
+        try
+        {
+            KoneksiDB a2 =new KoneksiDB();
+            String sql2 = "select * from pengguna where uid ="+uid;
+            ResultSet res2= a2.executeQuery(sql2);
+            while(res2.next())
+            {
+                lectureName = res2.getString("nama");
+            }
+        }
+        catch(Exception ex)
+        {
+            
+        }
+        return lectureName;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
