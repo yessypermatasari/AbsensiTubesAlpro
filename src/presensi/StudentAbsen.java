@@ -210,15 +210,15 @@ String nol_detik = "";
     private void jComboBox1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jComboBox1MouseClicked
         tampil_kelas(jComboBox1.getSelectedItem().toString());
     }//GEN-LAST:event_jComboBox1MouseClicked
-       
+
     private void jPanel3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel3MouseClicked
         boolean isLectureTap;
-       
+
         int id_matkul_selected = 0, uid_selected = 0;
-        
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String tgl = dateFormat.format(txttanggal.getDate());
-        
+
         try
         {
             KoneksiDB a =new KoneksiDB();
@@ -231,60 +231,59 @@ String nol_detik = "";
         }
         catch(Exception ex)
         {
-        
+
         }
         if(nama_matkul == ""){
-        isLectureTap = cekLectureTap(jComboBox1.getSelectedItem().toString(),tgl);
+            isLectureTap = cekLectureTap(jComboBox1.getSelectedItem().toString(),tgl);
         } else{
-        isLectureTap = true;
+            isLectureTap = true;
         }
         if(isLectureTap) {
-        if(nama_matkul == ""){
-            try
-            {
-                KoneksiDB a2 =new KoneksiDB();
-                String sql2 = "select * from pengguna where nim ="+jTextField1.getText();
-                ResultSet res2= a2.executeQuery(sql2);
-                while(res2.next())
+            if(nama_matkul == ""){
+                try
                 {
-                    uid_selected = res2.getInt("uid");
+                    KoneksiDB a2 =new KoneksiDB();
+                    String sql2 = "select * from pengguna where nim ="+jTextField1.getText();
+                    ResultSet res2= a2.executeQuery(sql2);
+                    while(res2.next())
+                    {
+                        uid_selected = res2.getInt("uid");
+                    }
                 }
+                catch(Exception ex)
+                {
+
+                }
+            } else{
+                uid_selected = UserSession.getU_uid();
             }
-            catch(Exception ex)
-            {
+            if ( "".equals(tgl)|| "".equals(jComboBox1.getSelectedItem().toString())|| "".equals(jComboBox3.getSelectedItem().toString())|| "".equals(jComboBox4.getSelectedItem().toString()))
+            {JOptionPane.showMessageDialog(this, "Harap Lengkapi Data", "Error", JOptionPane.WARNING_MESSAGE);
 
             }
-        } else{
-            uid_selected = UserSession.getU_uid();
-        }         
-        if ( "".equals(tgl)|| "".equals(jComboBox1.getSelectedItem().toString())|| "".equals(jComboBox3.getSelectedItem().toString())|| "".equals(jComboBox4.getSelectedItem().toString()))
-        {JOptionPane.showMessageDialog(this, "Harap Lengkapi Data", "Error", JOptionPane.WARNING_MESSAGE);
+            int j = 0;
+            String jam = getCurrentTimeUsingDate();
 
-        }
-        int j = 0;
-        String jam = getCurrentTimeUsingDate();
-          
-        String SQL = "INSERT INTO absensi (uid,id_matkul,kelas_absensi,reader,tanggal,jam_absensi)"
-        + "VALUES ('"+uid_selected
-        +"','"+id_matkul_selected
-        +"','"+jComboBox3.getSelectedItem().toString()
-        +"','"+jComboBox4.getSelectedItem().toString()
-        +"','"+tgl
-        +"','"+jam+"')";
+            String SQL = "INSERT INTO absensi (uid,id_matkul,kelas_absensi,reader,tanggal,jam_absensi)"
+            + "VALUES ('"+uid_selected
+            +"','"+id_matkul_selected
+            +"','"+jComboBox3.getSelectedItem().toString()
+            +"','"+jComboBox4.getSelectedItem().toString()
+            +"','"+tgl
+            +"','"+jam+"')";
 
-        int status = KoneksiDB.execute(SQL);
-        if (status == 1 ){
-            JOptionPane.showMessageDialog(this, "Tapping data berhasil","Sukses"+id_matkul_selected + " -" +uid_selected,JOptionPane.INFORMATION_MESSAGE);
-        }
-        else {
-            JOptionPane.showMessageDialog(this, "Tapping data gagal","Gagal", JOptionPane.WARNING_MESSAGE);
-        }
+            int status = KoneksiDB.execute(SQL);
+            if (status == 1 ){
+                JOptionPane.showMessageDialog(this, "Tapping data berhasil","Sukses",JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "Tapping data gagal","Gagal", JOptionPane.WARNING_MESSAGE);
+            }
         } else{
             JOptionPane.showMessageDialog(this, "Tapping data gagal, dosen anda belum hadir(tapping)","Gagal", JOptionPane.WARNING_MESSAGE);
         }
-
     }//GEN-LAST:event_jPanel3MouseClicked
-
+       
     /**
      * @param args the command line arguments
      */
